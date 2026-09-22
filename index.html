@@ -40,13 +40,13 @@
             </div>
 
             <div class="flex items-center space-x-3">
+                <button onclick="fetchData()" class="flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 transition">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span>새로고침</span>
+                </button>
                 <button onclick="resetData()" class="flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 transition">
                     <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                     <span>초기화</span>
-                </button>
-                <button onclick="exportExcel()" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition">
-                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
-                    <span>엑셀 다운로드</span>
                 </button>
                 <button onclick="window.print()" class="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition">
                     <i data-lucide="printer" class="w-3.5 h-3.5"></i>
@@ -58,18 +58,26 @@
 
     <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-        <!-- Top KPI Section -->
+        <!-- Top KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <!-- 1. 총 사용금액 Card -->
             <div class="bg-navy-900 text-white p-5 rounded-2xl shadow-md border border-slate-800 flex flex-col justify-between">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center space-x-2">
                         <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
-                        <select id="monthSelect" onchange="fetchData()" class="bg-slate-800 border border-slate-700 rounded-md text-xs font-bold px-2 py-1 text-white focus:outline-none">
-                            <option value="2026-09" selected>2026년 09월</option>
-                            <option value="2026-10">2026년 10월</option>
-                            <option value="2026-11">2026년 11월</option>
-                            <option value="2026-12">2026년 12월</option>
+                        <select id="monthSelect" onchange="fetchData()" class="bg-slate-800 border border-slate-700 rounded-md text-xs font-bold px-2.5 py-1 text-white focus:outline-none">
+                            <option value="1월">1월</option>
+                            <option value="2월">2월</option>
+                            <option value="3월">3월</option>
+                            <option value="4월">4월</option>
+                            <option value="5월">5월</option>
+                            <option value="6월">6월</option>
+                            <option value="7월">7월</option>
+                            <option value="8월">8월</option>
+                            <option value="9월" selected>9월</option>
+                            <option value="10월">10월</option>
+                            <option value="11월">11월</option>
+                            <option value="12월">12월</option>
                         </select>
                         <span class="text-xs text-slate-400">총 사용금액</span>
                     </div>
@@ -77,7 +85,6 @@
                 </div>
                 <div class="my-3">
                     <div class="text-3xl font-black" id="topTotalSpent">0 원</div>
-                    <div class="text-xs text-slate-400 mt-0.5" id="topTotalKorean">일금 영원정</div>
                 </div>
                 <div class="flex justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
                     <span id="topAvgSpent">1인 평균: 0원</span>
@@ -94,12 +101,12 @@
                     </div>
                 </div>
                 <div class="my-2">
-                    <div class="text-3xl font-black text-slate-900" id="topTotalBudget">4,347,771 원</div>
-                    <div class="text-xs text-slate-400 mt-1">하단 표의 11개 항목별 예산 합계</div>
+                    <div class="text-3xl font-black text-slate-900" id="topTotalBudget">0 원</div>
+                    <div class="text-xs text-slate-400 mt-1">하단 표의 11개 항목별 예산 합계 (수정 가능)</div>
                 </div>
                 <div class="flex justify-between items-center pt-2 border-t border-slate-100">
                     <span class="text-xs text-slate-400">예산 배정 상태</span>
-                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">예산 여유</span>
+                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded" id="budgetStatusBadge">예산 여유</span>
                 </div>
             </div>
 
@@ -112,7 +119,7 @@
                     </div>
                 </div>
                 <div class="my-2">
-                    <div class="text-3xl font-black text-emerald-600" id="topVariance">+4,347,771 원</div>
+                    <div class="text-3xl font-black text-emerald-600" id="topVariance">0 원</div>
                     <div class="text-xs font-bold text-emerald-600 mt-1" id="topVarianceStatus">예산 범위 내 여유 집행 중</div>
                 </div>
                 <div class="flex justify-between items-center pt-2 border-t border-slate-100">
@@ -122,7 +129,7 @@
             </div>
         </div>
 
-        <!-- Middle Grid Table -->
+        <!-- Grid Table Section -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="p-4 bg-white border-b border-slate-100 flex items-center justify-between">
                 <div class="flex items-center space-x-2">
@@ -155,9 +162,10 @@
                         </tr>
                     </thead>
                     <tbody id="matrixTbody" class="divide-y divide-slate-100 font-medium">
-                        <!-- Dynamic Input Grid -->
+                        <!-- Input Rows -->
                     </tbody>
                     <tfoot class="font-bold text-xs">
+                        <!-- 사용 총액 행 -->
                         <tr class="bg-navy-950 text-white">
                             <td class="py-3 px-3 font-black border-r border-slate-800">사용 총액</td>
                             <td class="py-3 px-1" id="colSpent-0">0</td>
@@ -173,44 +181,46 @@
                             <td class="py-3 px-1" id="colSpent-10">0</td>
                             <td class="py-3 px-3 border-l border-slate-800 bg-blue-600 text-white font-black text-sm" id="grandTotalSpent">0 원</td>
                         </tr>
+                        <!-- 예산 수정 행 -->
                         <tr class="bg-indigo-950 text-indigo-100 border-t border-slate-800">
-                            <td class="py-3 px-3 font-black border-r border-slate-800">🎯 예산</td>
-                            <td class="py-3 px-1" id="colBudget-0">924,000</td>
-                            <td class="py-3 px-1 text-indigo-300" id="colBudget-1">미설정</td>
-                            <td class="py-3 px-1" id="colBudget-2">2,100,000</td>
-                            <td class="py-3 px-1 text-indigo-300" id="colBudget-3">미설정</td>
-                            <td class="py-3 px-1 text-indigo-300" id="colBudget-4">미설정</td>
-                            <td class="py-3 px-1" id="colBudget-5">350,000</td>
-                            <td class="py-3 px-1" id="colBudget-6">210,000</td>
-                            <td class="py-3 px-1" id="colBudget-7">442,026</td>
-                            <td class="py-3 px-1" id="colBudget-8">88,972</td>
-                            <td class="py-3 px-1" id="colBudget-9">232,773</td>
-                            <td class="py-3 px-1 text-indigo-300" id="colBudget-10">미설정</td>
-                            <td class="py-3 px-3 border-l border-slate-800 bg-indigo-900 font-black text-white" id="grandTotalBudget">4,347,771 원</td>
+                            <td class="py-3 px-3 font-black border-r border-slate-800">🎯 예산 (수정)</td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-0" oninput="onBudgetChange(0)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-1" oninput="onBudgetChange(1)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-2" oninput="onBudgetChange(2)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-3" oninput="onBudgetChange(3)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-4" oninput="onBudgetChange(4)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-5" oninput="onBudgetChange(5)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-6" oninput="onBudgetChange(6)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-7" oninput="onBudgetChange(7)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-8" oninput="onBudgetChange(8)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-9" oninput="onBudgetChange(9)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-1 px-1"><input type="number" id="budgetInput-10" oninput="onBudgetChange(10)" class="w-full text-center py-1 bg-indigo-900 border border-indigo-700 rounded text-white font-bold outline-none" placeholder="0"></td>
+                            <td class="py-3 px-3 border-l border-slate-800 bg-indigo-900 font-black text-white" id="grandTotalBudget">0 원</td>
                         </tr>
+                        <!-- 차액 행 -->
                         <tr class="bg-slate-50 border-t border-slate-200">
                             <td class="py-3 px-3 font-black border-r border-slate-200 text-slate-700">⚖️ 차액</td>
-                            <td class="py-3 px-1 text-emerald-600" id="colVar-0">+924,000</td>
-                            <td class="py-3 px-1 text-slate-400" id="colVar-1">미설정</td>
-                            <td class="py-3 px-1 text-emerald-600" id="colVar-2">+2,100,000</td>
-                            <td class="py-3 px-1 text-slate-400" id="colVar-3">미설정</td>
-                            <td class="py-3 px-1 text-slate-400" id="colVar-4">미설정</td>
-                            <td class="py-3 px-1 text-emerald-600" id="colVar-5">+350,000</td>
-                            <td class="py-3 px-1 text-emerald-600" id="colVar-6">+210,000</td>
-                            <td class="py-3 px-1 text-emerald-600" id="colVar-7">+442,026</td>
-                            <td class="py-3 px-1 text-emerald-600" id="colVar-8">+88,972</td>
-                            <td class="py-3 px-1 text-emerald-600" id="colVar-9">+232,773</td>
-                            <td class="py-3 px-1 text-slate-400" id="colVar-10">미설정</td>
-                            <td class="py-3 px-3 border-l border-slate-200 bg-emerald-100 text-emerald-700 font-black text-sm" id="grandTotalVariance">+4,347,771 원 (잔여)</td>
+                            <td class="py-3 px-1" id="colVar-0">0</td>
+                            <td class="py-3 px-1" id="colVar-1">0</td>
+                            <td class="py-3 px-1" id="colVar-2">0</td>
+                            <td class="py-3 px-1" id="colVar-3">0</td>
+                            <td class="py-3 px-1" id="colVar-4">0</td>
+                            <td class="py-3 px-1" id="colVar-5">0</td>
+                            <td class="py-3 px-1" id="colVar-6">0</td>
+                            <td class="py-3 px-1" id="colVar-7">0</td>
+                            <td class="py-3 px-1" id="colVar-8">0</td>
+                            <td class="py-3 px-1" id="colVar-9">0</td>
+                            <td class="py-3 px-1" id="colVar-10">0</td>
+                            <td class="py-3 px-3 border-l border-slate-200 bg-emerald-100 text-emerald-700 font-black text-sm" id="grandTotalVariance">0 원</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
 
-        <!-- Bottom 11 Category Cards -->
+        <!-- Bottom Category Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2.5" id="categoryCards">
-            <!-- Dynamic 11 category cards -->
+            <!-- Dynamic Cards -->
         </div>
 
     </main>
@@ -220,19 +230,20 @@
         
         const MEMBERS = ["류지환", "이화섭", "오병욱", "이은주", "조성화", "육지원", "원치진"];
         const CATEGORIES = [
-            { name: "식대", icon: "☕", budget: 924000 },
-            { name: "출장비", icon: "✈️", budget: null },
-            { name: "외근", icon: "💼", budget: 2100000 },
-            { name: "유류대", icon: "⛽", budget: null },
-            { name: "쏘카", icon: "🚗", budget: null },
-            { name: "회식대", icon: "🍺", budget: 350000 },
-            { name: "조직관리", icon: "🏢", budget: 210000 },
-            { name: "차량보조", icon: "🚘", budget: 442026 },
-            { name: "주차비", icon: "🅿️", budget: 88972 },
-            { name: "통행료", icon: "🛣️", budget: 232773 },
-            { name: "회의비", icon: "🗣️", budget: null }
+            { name: "식대", icon: "☕" },
+            { name: "출장비", icon: "✈️" },
+            { name: "외근", icon: "💼" },
+            { name: "유류대", icon: "⛽" },
+            { name: "쏘카", icon: "🚗" },
+            { name: "회식대", icon: "🍺" },
+            { name: "조직관리", icon: "🏢" },
+            { name: "차량보조", icon: "🚘" },
+            { name: "주차비", icon: "🅿️" },
+            { name: "통행료", icon: "🛣️" },
+            { name: "회의비", icon: "🗣️" }
         ];
 
+        let categoryBudgets = [924000, 0, 2100000, 0, 0, 350000, 210000, 442026, 88972, 232773, 0];
         let matrixData = MEMBERS.map(() => Array(CATEGORIES.length).fill(0));
         let saveTimeout = null;
 
@@ -254,13 +265,28 @@
                 rowHtml += `<td class="py-2 px-3 border-l border-slate-200 bg-slate-50 font-bold text-blue-600 text-right" id="rowTotal-${rIdx}">0원</td></tr>`;
                 tbody.innerHTML += rowHtml;
             });
+
+            CATEGORIES.forEach((_, cIdx) => {
+                const bInput = document.getElementById(`budgetInput-${cIdx}`);
+                if(bInput) bInput.value = categoryBudgets[cIdx];
+            });
         }
 
         function onCellChange(rIdx, cIdx) {
             const val = Number(document.getElementById(`cell-${rIdx}-${cIdx}`).value) || 0;
             matrixData[rIdx][cIdx] = val;
             calculateAll();
+            triggerAutoSave();
+        }
 
+        function onBudgetChange(cIdx) {
+            const val = Number(document.getElementById(`budgetInput-${cIdx}`).value) || 0;
+            categoryBudgets[cIdx] = val;
+            calculateAll();
+            triggerAutoSave();
+        }
+
+        function triggerAutoSave() {
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(syncToGoogleSheet, 1000);
         }
@@ -281,26 +307,31 @@
                 grandTotalSpent += rowSum;
             });
 
-            CATEGORIES.forEach((cat, cIdx) => {
+            CATEGORIES.forEach((_, cIdx) => {
                 const spent = colSums[cIdx];
+                const budget = categoryBudgets[cIdx] || 0;
+                grandTotalBudget += budget;
+
                 document.getElementById(`colSpent-${cIdx}`).innerText = spent.toLocaleString();
                 
-                if (cat.budget !== null) {
-                    grandTotalBudget += cat.budget;
-                    const diff = cat.budget - spent;
-                    const el = document.getElementById(`colVar-${cIdx}`);
-                    if(diff >= 0) {
-                        el.innerText = '+' + diff.toLocaleString();
-                        el.className = 'py-3 px-1 text-emerald-600 font-bold';
-                    } else {
-                        el.innerText = diff.toLocaleString();
-                        el.className = 'py-3 px-1 text-rose-500 font-bold';
-                    }
+                const diff = budget - spent;
+                const el = document.getElementById(`colVar-${cIdx}`);
+                if (budget === 0 && spent === 0) {
+                    el.innerText = '미설정';
+                    el.className = 'py-3 px-1 text-slate-400 font-medium';
+                } else if (diff >= 0) {
+                    el.innerText = '+' + diff.toLocaleString();
+                    el.className = 'py-3 px-1 text-emerald-600 font-bold';
+                } else {
+                    el.innerText = diff.toLocaleString();
+                    el.className = 'py-3 px-1 text-rose-500 font-bold';
                 }
             });
 
             document.getElementById('topTotalSpent').innerText = grandTotalSpent.toLocaleString() + ' 원';
             document.getElementById('grandTotalSpent').innerText = grandTotalSpent.toLocaleString() + ' 원';
+            document.getElementById('topTotalBudget').innerText = grandTotalBudget.toLocaleString() + ' 원';
+            document.getElementById('grandTotalBudget').innerText = grandTotalBudget.toLocaleString() + ' 원';
             document.getElementById('topAvgSpent').innerText = `1인 평균: ${Math.round(grandTotalSpent / 7).toLocaleString()}원`;
             
             const variance = grandTotalBudget - grandTotalSpent;
@@ -319,11 +350,12 @@
 
             CATEGORIES.forEach((cat, cIdx) => {
                 const spent = colSums[cIdx];
+                const budget = categoryBudgets[cIdx] || 0;
                 let subText = '미설정';
                 let subColor = 'text-slate-400';
 
-                if (cat.budget !== null) {
-                    const diff = cat.budget - spent;
+                if (budget > 0 || spent > 0) {
+                    const diff = budget - spent;
                     subText = (diff >= 0 ? '+' : '') + diff.toLocaleString() + '원';
                     subColor = diff >= 0 ? 'text-emerald-600' : 'text-rose-500';
                 }
@@ -345,6 +377,7 @@
                 if(json.result === 'success' && json.data.length > 0) {
                     const selectedMonth = document.getElementById('monthSelect').value;
                     const monthRows = json.data.filter(r => r[1] === selectedMonth);
+                    
                     if(monthRows.length > 0) {
                         const lastRecord = monthRows[monthRows.length - 1];
                         const parsedMatrix = JSON.parse(lastRecord[2]);
@@ -357,8 +390,25 @@
                                 if(input) input.value = val;
                             });
                         });
-                        calculateAll();
+
+                        if(lastRecord[3]) {
+                            const parsedBudgets = JSON.parse(lastRecord[3]);
+                            categoryBudgets = parsedBudgets;
+                            CATEGORIES.forEach((_, cIdx) => {
+                                const bInput = document.getElementById(`budgetInput-${cIdx}`);
+                                if(bInput) bInput.value = categoryBudgets[cIdx];
+                            });
+                        }
+                    } else {
+                        matrixData = MEMBERS.map(() => Array(CATEGORIES.length).fill(0));
+                        MEMBERS.forEach((_, rIdx) => {
+                            CATEGORIES.forEach((_, cIdx) => {
+                                const input = document.getElementById(`cell-${rIdx}-${cIdx}`);
+                                if(input) input.value = 0;
+                            });
+                        });
                     }
+                    calculateAll();
                 }
             } catch(e) {
                 console.error("동기화 실패:", e);
@@ -380,7 +430,11 @@
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ month: selectedMonth, matrix: payloadMatrix })
+                    body: JSON.stringify({ 
+                        month: selectedMonth, 
+                        matrix: payloadMatrix,
+                        budgets: categoryBudgets
+                    })
                 });
             } catch(e) {
                 console.error("저장 실패:", e);
@@ -388,7 +442,7 @@
         }
 
         function resetData() {
-            if(confirm("모든 숫자를 0으로 초기화하시겠습니까?")) {
+            if(confirm("현재 선택된 월의 데이터를 0으로 초기화하시겠습니까?")) {
                 matrixData = MEMBERS.map(() => Array(CATEGORIES.length).fill(0));
                 MEMBERS.forEach((_, rIdx) => {
                     CATEGORIES.forEach((_, cIdx) => {
