@@ -3,243 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>품질기획팀 월별 비용 정산 및 예산 관리 대시보드</title>
-    <style>
-        :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --accent-green: #059669;
-            --accent-red: #dc2626;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .title {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        select, input, button {
-            padding: 8px 14px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            font-size: 14px;
-            outline: none;
-        }
-
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .card-title {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .card-value {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .card-sub {
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .text-green { color: var(--accent-green); }
-        .text-red { color: var(--accent-red); }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 24px;
-        }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
+    <title>품질기획팀 월별 비용 정산 및 예산 관리 시스템</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Noto Sans KR Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#172554',
+                        }
+                    }
+                }
             }
         }
-
-        .form-section, .table-section {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text-main);
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .form-group select, .form-group input {
-            width: 100%;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 13px;
-        }
-
-        th, td {
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            background-color: #f1f5f9;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .text-right { text-align: right; }
-        .font-bold { font-weight: 700; }
-        .status-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .sync-status {
-            font-size: 12px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #22c55e;
-            display: inline-block;
-        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <div class="header">
-        <div>
-            <div class="title">품질기획팀 월별 비용 정산 및 예산 관리</div>
-            <div class="sync-status"><span class="dot"></span> 구글 시트 실시간 취합 데이터베이스 연동됨</div>
-        </div>
-        <div class="controls">
-            <select id="monthSelect" onchange="renderData()">
-                <option value="2026-09" selected>2026년 09월</option>
-                <option value="2026-10">2026년 10월</option>
-                <option value="2026-11">2026년 11월</option>
-                <option value="2026-12">2026년 12월</option>
-            </select>
-            <button onclick="fetchSheetData()">🔄 새로고침</button>
-        </div>
-    </div>
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-600 text-white p-2 rounded-lg shadow-sm">
+                    <i data-lucide="calculator" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 leading-tight">품질기획팀 비용 정산 & 예산 관리</h1>
+                    <p class="text-xs text-slate-500 font-medium flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                        구글 시트 실시간 데이터베이스 연동됨 (7명 자동 취합)
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <!-- 월 선택 필터 -->
+                <div class="relative flex items-center">
+                    <i data-lucide="calendar" class="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none"></i>
+                    <select id="monthFilter" onchange="renderApp()" class="pl-9 pr-8 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg border-0 cursor-pointer focus:ring-2 focus:ring-brand-500 transition-colors">
+                        <option value="2026-09" selected>2026년 9월</option>
+                        <option value="2026-10">2026년 10월</option>
+                        <option value="2026-11">2026년 11월</option>
+                        <option value="2026-12">2026년 12월</option>
+                    </select>
+                </div>
 
-    <!-- 핵심 KPI 요약 카드 -->
-    <div class="summary-cards">
-        <div class="card">
-            <div class="card-title">월 예산 총액</div>
-            <div class="card-value" id="totalBudgetDisplay">0 원</div>
-            <div class="card-sub text-muted">팀 설정 기준 예산</div>
-        </div>
-        <div class="card">
-            <div class="card-title">현재 총 집행액</div>
-            <div class="card-value" id="totalSpentDisplay">0 원</div>
-            <div class="card-sub" id="execRateDisplay">집행률 0%</div>
-        </div>
-        <div class="card">
-            <div class="card-title">예산 잔액 (차액)</div>
-            <div class="card-value" id="budgetVarianceDisplay">0 원</div>
-            <div class="card-sub" id="varianceStatusDisplay">-</div>
-        </div>
-    </div>
+                <!-- 새로고침 버튼 -->
+                <button onclick="fetchData()" class="p-2 text-slate-600 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200" title="데이터 새로고침">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
 
-    <div class="main-grid">
-        <!-- 데이터 입력 폼 -->
-        <div class="form-section">
-            <div class="section-title">비용 항목 입력</div>
-            <form id="expenseForm" onsubmit="submitExpense(event)">
-                <div class="form-group">
-                    <label for="teamMember">팀원 성명</label>
-                    <select id="teamMember" required>
-                        <option value="">선택하세요</option>
+                <!-- 내역 추가 모달 열기 버튼 -->
+                <button onclick="openModal()" class="flex items-center space-x-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition-all duration-200 hover:shadow">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>지출 내역 등록</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Top Summary Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+            <!-- 총 예산 -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">팀 총 예산</span>
+                    <div class="text-2xl font-black text-slate-900 mt-1" id="kpiBudget">0 원</div>
+                    <span class="text-xs text-slate-400 font-medium">품질기획팀 기준 예산</span>
+                </div>
+                <div class="p-2.5 bg-slate-100 text-slate-600 rounded-lg">
+                    <i data-lucide="wallet" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <!-- 총 집행 금액 -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">현재 총 집행액</span>
+                    <div class="text-2xl font-black text-slate-900 mt-1" id="kpiSpent">0 원</div>
+                    <span class="text-xs font-semibold text-brand-600" id="kpiRate">집행률 0%</span>
+                </div>
+                <div class="p-2.5 bg-brand-50 text-brand-600 rounded-lg">
+                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <!-- 예산 차액 (잔액) -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">예산 차액 (잔액)</span>
+                    <div class="text-2xl font-black text-emerald-600 mt-1" id="kpiVariance">0 원</div>
+                    <span class="text-xs font-semibold text-emerald-600" id="kpiStatus">예산 내 안정 집행</span>
+                </div>
+                <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg" id="kpiIconBg">
+                    <i data-lucide="trending-down" class="w-5 h-5" id="kpiIcon"></i>
+                </div>
+            </div>
+
+            <!-- 정산 건수 -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">총 정산 건수</span>
+                    <div class="text-2xl font-black text-slate-900 mt-1" id="kpiCount">0 건</div>
+                    <span class="text-xs text-slate-400 font-medium">등록 완료 데이터</span>
+                </div>
+                <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Section: Member & Category Breakdowns -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- 1. 팀원별 집행 현황 (7명) -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="users" class="w-5 h-5 text-brand-600"></i>
+                        <h2 class="font-bold text-slate-800 text-lg">팀원별 정산 집행 현황 (7명)</h2>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-400">자동 합산</span>
+                </div>
+
+                <div class="space-y-3 flex-1" id="memberList">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <!-- 2. 항목별 집행 현황 (8개 항목) -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600"></i>
+                        <h2 class="font-bold text-slate-800 text-lg">계정 항목별 비중 (8개 항목)</h2>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-400">누적 합계</span>
+                </div>
+
+                <div class="space-y-3 flex-1" id="categoryList">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Section: Detailed Transactions Table -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="list-filter" class="w-5 h-5 text-slate-600"></i>
+                    <h2 class="font-bold text-slate-800 text-lg">전체 세부 지출 내역</h2>
+                </div>
+                <div class="text-xs text-slate-500 font-medium">
+                    실시간 구글 시트 저장
+                </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                            <th class="py-3.5 px-6">등록 일시</th>
+                            <th class="py-3.5 px-6">팀원 성명</th>
+                            <th class="py-3.5 px-6">계정 항목</th>
+                            <th class="py-3.5 px-6 text-right">금액 (원)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTable" class="divide-y divide-slate-100 text-slate-700">
+                        <!-- Dynamic rendering -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal for Adding Expense -->
+    <div id="expenseModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transition-all transform scale-100">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <div class="p-2 bg-brand-50 text-brand-600 rounded-lg">
+                        <i data-lucide="file-plus" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg">지출 내역 등록</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="modalForm" onsubmit="handleFormSubmit(event)" class="mt-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">팀원 성명</label>
+                    <select id="inputMember" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 font-medium focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none">
+                        <option value="">팀원을 선택하세요</option>
                         <option value="류지환">류지환</option>
                         <option value="이화섭">이화섭</option>
                         <option value="오병욱">오병욱</option>
@@ -249,10 +235,11 @@
                         <option value="원치진">원치진</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="category">비용 항목</label>
-                    <select id="category" required>
-                        <option value="">선택하세요</option>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">계정 항목</label>
+                    <select id="inputCategory" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 font-medium focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none">
+                        <option value="">항목을 선택하세요</option>
                         <option value="복리-식대">복리-식대</option>
                         <option value="국내출장비">국내출장비</option>
                         <option value="외근">외근</option>
@@ -262,62 +249,187 @@
                         <option value="조직관리비">조직관리비</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="amount">금액 (원)</label>
-                    <input type="number" id="amount" placeholder="예: 15000" required min="0" step="100">
-                </div>
-                <button type="submit" style="width: 100%; margin-top: 10px;" id="submitBtn">구글 시트로 저장 및 합산</button>
-            </form>
-        </div>
 
-        <!-- 실시간 요약 테이블 -->
-        <div class="table-section">
-            <div class="section-title">팀원별 / 항목별 집행 현황</div>
-            <table id="summaryTable">
-                <thead>
-                    <tr>
-                        <th>구분 (팀원 / 항목)</th>
-                        <th class="text-right">건수</th>
-                        <th class="text-right">총 집행금액</th>
-                        <th class="text-right">비중</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr><td colspan="4" style="text-align:center; color:#94a3b8;">데이터를 불러오는 중입니다...</td></tr>
-                </tbody>
-            </table>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">금액 (원)</label>
+                    <input type="number" id="inputAmount" required min="0" step="100" placeholder="예: 15000" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 font-medium focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none">
+                </div>
+
+                <div class="pt-3 flex space-x-3">
+                    <button type="button" onclick="closeModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-semibold rounded-lg transition-colors">
+                        취소
+                    </button>
+                    <button type="submit" id="submitBtn" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors">
+                        구글 시트 저장
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
+    <!-- JavaScript Logic -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbykYKgA4RM_AcQhKmk6h2yrO56LInOyTgZP-eJjatCOdYEjOY26luAyRpPGRDGdjFKP/exec";
-        const TEAM_BUDGET = 5000000; // 품질기획팀 기본 월 예산 설정 (필요시 변경)
-        let rawData = [];
+        const TOTAL_BUDGET = 5000000; // 월 팀 예산 (5,000,000원)
 
-        async function fetchSheetData() {
+        const MEMBERS = ["류지환", "이화섭", "오병욱", "이은주", "조성화", "육지원", "원치진"];
+        const CATEGORIES = ["복리-식대", "국내출장비", "외근", "유류대", "쏘카", "회식대", "조직관리비"];
+
+        let rawTransactions = [];
+
+        // 데이터 페치
+        async function fetchData() {
             try {
                 const res = await fetch(API_URL);
                 const json = await res.json();
                 if(json.result === 'success') {
-                    rawData = json.data.slice(1); // 헤더 제외
-                    renderData();
+                    rawTransactions = json.data.slice(1); // 첫 라인 헤더 제외
+                    renderApp();
                 }
-            } catch (e) {
-                console.error("데이터 로드 실패:", e);
+            } catch(e) {
+                console.error("데이터 로딩 실패:", e);
             }
         }
 
-        async function submitExpense(e) {
+        // 전체 화면 렌더링
+        function renderApp() {
+            const selectedMonth = document.getElementById('monthFilter').value;
+            
+            // 해당 월 데이터 필터링
+            const filtered = rawTransactions.filter(item => {
+                const itemMonth = item[4];
+                return !itemMonth || itemMonth === selectedMonth;
+            });
+
+            // 1. KPI 계산
+            let totalSpent = 0;
+            const memberMap = {};
+            MEMBERS.forEach(m => memberMap[m] = 0);
+            
+            const categoryMap = {};
+            CATEGORIES.forEach(c => categoryMap[c] = 0);
+
+            filtered.forEach(row => {
+                const member = row[1];
+                const category = row[2];
+                const amount = Number(row[3]) || 0;
+
+                totalSpent += amount;
+                if(memberMap[member] !== undefined) memberMap[member] += amount;
+                if(categoryMap[category] !== undefined) categoryMap[category] += amount;
+            });
+
+            const variance = TOTAL_BUDGET - totalSpent;
+            const execRate = TOTAL_BUDGET > 0 ? ((totalSpent / TOTAL_BUDGET) * 100).toFixed(1) : 0;
+
+            // KPI 업데이트
+            document.getElementById('kpiBudget').innerText = TOTAL_BUDGET.toLocaleString() + ' 원';
+            document.getElementById('kpiSpent').innerText = totalSpent.toLocaleString() + ' 원';
+            document.getElementById('kpiRate').innerText = `집행률 ${execRate}%`;
+            document.getElementById('kpiCount').innerText = filtered.length + ' 건';
+
+            const varEl = document.getElementById('kpiVariance');
+            const statusEl = document.getElementById('kpiStatus');
+            
+            varEl.innerText = Math.abs(variance).toLocaleString() + ' 원';
+            if(variance >= 0) {
+                varEl.className = "text-2xl font-black text-emerald-600 mt-1";
+                statusEl.innerText = "예산 내 안정 집행";
+                statusEl.className = "text-xs font-semibold text-emerald-600";
+            } else {
+                varEl.className = "text-2xl font-black text-rose-600 mt-1";
+                statusEl.innerText = "예산 초과 집행 주의";
+                statusEl.className = "text-xs font-semibold text-rose-600";
+            }
+
+            // 2. 팀원별 리스트 렌더링
+            const memberListEl = document.getElementById('memberList');
+            memberListEl.innerHTML = '';
+            MEMBERS.forEach(m => {
+                const spent = memberMap[m];
+                const pct = totalSpent > 0 ? ((spent / totalSpent) * 100).toFixed(1) : 0;
+
+                memberListEl.innerHTML += `
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-sm font-medium">
+                            <span class="text-slate-700 font-bold">${m}</span>
+                            <span class="text-slate-900 font-bold">${spent.toLocaleString()} 원 <span class="text-xs font-normal text-slate-400">(${pct}%)</span></span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div class="bg-brand-600 h-2 rounded-full transition-all duration-500" style="width: ${Math.min(pct, 100)}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 3. 계정 항목별 리스트 렌더링
+            const categoryListEl = document.getElementById('categoryList');
+            categoryListEl.innerHTML = '';
+            CATEGORIES.forEach(c => {
+                const spent = categoryMap[c];
+                const pct = totalSpent > 0 ? ((spent / totalSpent) * 100).toFixed(1) : 0;
+
+                categoryListEl.innerHTML += `
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-sm font-medium">
+                            <span class="text-slate-700">${c}</span>
+                            <span class="text-slate-900 font-bold">${spent.toLocaleString()} 원 <span class="text-xs font-normal text-slate-400">(${pct}%)</span></span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div class="bg-indigo-500 h-2 rounded-full transition-all duration-500" style="width: ${Math.min(pct, 100)}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 4. 세부 내역 테이블 렌더링
+            const tableEl = document.getElementById('transactionTable');
+            tableEl.innerHTML = '';
+
+            if(filtered.length === 0) {
+                tableEl.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 font-medium">등록된 지출 내역이 없습니다.</td></tr>`;
+            } else {
+                [...filtered].reverse().forEach(row => {
+                    const dateStr = row[0] ? new Date(row[0]).toLocaleDateString('ko-KR') : '-';
+                    tableEl.innerHTML += `
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="py-3 px-6 text-xs text-slate-400 font-mono">${dateStr}</td>
+                            <td class="py-3 px-6 font-semibold text-slate-800">${row[1]}</td>
+                            <td class="py-3 px-6">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                                    ${row[2]}
+                                </span>
+                            </td>
+                            <td class="py-3 px-6 text-right font-bold text-slate-900">${Number(row[3]).toLocaleString()} 원</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            lucide.createIcons();
+        }
+
+        // 모달 열기/닫기
+        function openModal() {
+            document.getElementById('expenseModal').classList.remove('hidden');
+        }
+        function closeModal() {
+            document.getElementById('expenseModal').classList.add('hidden');
+            document.getElementById('modalForm').reset();
+        }
+
+        // 폼 제출
+        async function handleFormSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.innerText = "저장 중...";
 
             const payload = {
-                member: document.getElementById('teamMember').value,
-                category: document.getElementById('category').value,
-                amount: document.getElementById('amount').value,
-                month: document.getElementById('monthSelect').value
+                member: document.getElementById('inputMember').value,
+                category: document.getElementById('inputCategory').value,
+                amount: document.getElementById('inputAmount').value,
+                month: document.getElementById('monthFilter').value
             };
 
             try {
@@ -328,74 +440,19 @@
                     body: JSON.stringify(payload)
                 });
                 alert("성공적으로 저장되었습니다!");
-                document.getElementById('amount').value = '';
-                setTimeout(fetchSheetData, 1000);
-            } catch (err) {
+                closeModal();
+                setTimeout(fetchData, 1000);
+            } catch(err) {
                 alert("저장 실패: 다시 시도해 주세요.");
             } finally {
                 btn.disabled = false;
-                btn.innerText = "구글 시트로 저장 및 합산";
+                btn.innerText = "구글 시트 저장";
             }
         }
 
-        function renderData() {
-            const currentMonth = document.getElementById('monthSelect').value;
-            const filtered = rawData.filter(row => row[4] === currentMonth || !row[4]);
-
-            let totalSpent = 0;
-            const memberMap = {};
-
-            filtered.forEach(row => {
-                const member = row[1];
-                const amount = Number(row[3]) || 0;
-                totalSpent += amount;
-                memberMap[member] = (memberMap[member] || 0) + amount;
-            });
-
-            // KPI 업데이트
-            document.getElementById('totalBudgetDisplay').innerText = TEAM_BUDGET.toLocaleString() + ' 원';
-            document.getElementById('totalSpentDisplay').innerText = totalSpent.toLocaleString() + ' 원';
-            
-            const variance = TEAM_BUDGET - totalSpent;
-            const varDisplay = document.getElementById('budgetVarianceDisplay');
-            varDisplay.innerText = Math.abs(variance).toLocaleString() + ' 원';
-            
-            const statusDisplay = document.getElementById('varianceStatusDisplay');
-            if (variance >= 0) {
-                varDisplay.className = "card-value text-green";
-                statusDisplay.innerText = "예산 남음 (안정)";
-                statusDisplay.className = "card-sub text-green";
-            } else {
-                varDisplay.className = "card-value text-red";
-                statusDisplay.innerText = "예산 초과 (주의)";
-                statusDisplay.className = "card-sub text-red";
-            }
-
-            const execRate = TEAM_BUDGET > 0 ? ((totalSpent / TEAM_BUDGET) * 100).toFixed(1) : 0;
-            document.getElementById('execRateDisplay').innerText = `집행률 ${execRate}%`;
-
-            // 테이블 렌더링
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-
-            const members = ["류지환", "이화섭", "오병욱", "이은주", "조성화", "육지원", "원치진"];
-            members.forEach(m => {
-                const spent = memberMap[m] || 0;
-                const ratio = totalSpent > 0 ? ((spent / totalSpent) * 100).toFixed(1) : 0;
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="font-bold">${m}</td>
-                    <td class="text-right">-</td>
-                    <td class="text-right font-bold">${spent.toLocaleString()} 원</td>
-                    <td class="text-right">${ratio}%</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // 초기 로드
-        fetchSheetData();
+        // 초기 실행
+        fetchData();
+        lucide.createIcons();
     </script>
 </body>
 </html>
