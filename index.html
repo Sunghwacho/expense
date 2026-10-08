@@ -40,6 +40,11 @@
             </div>
 
             <div class="flex items-center space-x-3">
+                <!-- 동기화 상태 표시 배지 -->
+                <span id="saveStatus" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 flex items-center space-x-1">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                    <span>동기화 완료</span>
+                </span>
                 <button onclick="fetchData()" class="flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 transition">
                     <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                     <span>새로고침</span>
@@ -74,7 +79,7 @@
                             <option value="6월">6월</option>
                             <option value="7월">7월</option>
                             <option value="8월">8월</option>
-                            <option value="9월" selected>9월</option>
+                            <option value="9월">9월</option>
                             <option value="10월">10월</option>
                             <option value="11월">11월</option>
                             <option value="12월">12월</option>
@@ -245,7 +250,43 @@
 
         let categoryBudgets = [924000, 0, 2100000, 0, 0, 350000, 210000, 442026, 88972, 232773, 0];
         let matrixData = MEMBERS.map(() => Array(CATEGORIES.length).fill(0));
+        
+        // [개선 3] 각 인원/항목별 처리 여부 상태 배열 ('미처리' | '완료')
+        let statusData = MEMBERS.map(() => Array(CATEGORIES.length).fill('미처리'));
+
         let saveTimeout = null;
+
+        // [개선 2] 접속 시 현재 날짜 기준 달(Month) 자동 지정
+        function setDefaultMonth() {
+            const now = new Date();
+            const currentMonth = (now.getMonth() + 1) + "월";
+            const monthSelect = document.getElementById('monthSelect');
+            if (monthSelect) {
+                for (let i = 0; i < monthSelect.options.length; i++) {
+                    if (monthSelect.options[i].value === currentMonth) {
+                        monthSelect.value = currentMonth;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // [개선 1] 상단 동기화 및 저장 상태 UI 업데이트 함수
+        function updateSaveStatus(status) {
+            const statusEl = document.getElementById('saveStatus');
+            if (!statusEl) return;
+            if (status === 'saving') {
+                statusEl.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center space-x-1';
+                statusEl.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>저장 중...</span>`;
+            } else if (status === 'saved') {
+                statusEl.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center space-x-1';
+                statusEl.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>동기화 완료</span>`;
+            } else if (status === 'error') {
+                statusEl.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center space-x-1';
+                statusEl.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5"></i><span>저장 실패</span>`;
+            }
+            lucide.createIcons();
+        }
 
         function buildGrid() {
             const tbody = document.getElementById('matrixTbody');
@@ -256,9 +297,17 @@
                     <td class="py-2 px-3 font-bold text-slate-700 bg-slate-50 border-r border-slate-200">${m}</td>`;
                 
                 CATEGORIES.forEach((_, cIdx) => {
-                    rowHtml += `<td class="py-1.5 px-1">
-                        <input type="number" id="cell-${rIdx}-${cIdx}" value="0" min="0" oninput="onCellChange(${rIdx}, ${cIdx})" 
-                            class="w-full text-center py-1 bg-white border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-semibold text-slate-800 transition">
+                    rowHtml += `<td class="py-1.5 px-1 relative">
+                        <div class="flex items-center space-x-1">
+                            <input type="number" id="cell-${rIdx}-${cIdx}" value="0" min="0" oninput="onCellChange(${rIdx}, ${cIdx})" 
+                                class="w-full text-center py-1 bg-white border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-semibold text-slate-800 transition">
+                            <!-- [개선 3] 처리 여부 토글 버튼 -->
+                            <button id="statusBtn-${rIdx}-${cIdx}" onclick="toggleStatus(${rIdx}, ${cIdx})" 
+                                title="클릭하여 처리여부(미처리/완료) 전환"
+                                class="px-1.5 py-1 text-[10px] font-bold rounded border transition shrink-0 bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200">
+                                미처리
+                            </button>
+                        </div>
                     </td>`;
                 });
 
@@ -270,6 +319,36 @@
                 const bInput = document.getElementById(`budgetInput-${cIdx}`);
                 if(bInput) bInput.value = categoryBudgets[cIdx];
             });
+        }
+
+        // [개선 3] 처리 여부 토글 함수
+        function toggleStatus(rIdx, cIdx) {
+            const current = statusData[rIdx][cIdx] || '미처리';
+            const next = current === '완료' ? '미처리' : '완료';
+            statusData[rIdx][cIdx] = next;
+            updateStatusUI(rIdx, cIdx);
+            triggerAutoSave();
+        }
+
+        function updateStatusUI(rIdx, cIdx) {
+            const btn = document.getElementById(`statusBtn-${rIdx}-${cIdx}`);
+            const input = document.getElementById(`cell-${rIdx}-${cIdx}`);
+            if (!btn) return;
+
+            const st = statusData[rIdx][cIdx] || '미처리';
+            if (st === '완료') {
+                btn.innerText = '완료';
+                btn.className = 'px-1.5 py-1 text-[10px] font-bold rounded border transition shrink-0 bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200';
+                if (input) {
+                    input.classList.add('bg-emerald-50/60', 'text-emerald-900', 'line-through');
+                }
+            } else {
+                btn.innerText = '미처리';
+                btn.className = 'px-1.5 py-1 text-[10px] font-bold rounded border transition shrink-0 bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100';
+                if (input) {
+                    input.classList.remove('bg-emerald-50/60', 'text-emerald-900', 'line-through');
+                }
+            }
         }
 
         function onCellChange(rIdx, cIdx) {
@@ -286,9 +365,11 @@
             triggerAutoSave();
         }
 
+        // [개선 1] 자동저장 스케줄링 및 상태 표시
         function triggerAutoSave() {
+            updateSaveStatus('saving');
             clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(syncToGoogleSheet, 1000);
+            saveTimeout = setTimeout(syncToGoogleSheet, 800);
         }
 
         function calculateAll() {
@@ -302,6 +383,7 @@
                     const val = matrixData[rIdx][cIdx];
                     rowSum += val;
                     colSums[cIdx] += val;
+                    updateStatusUI(rIdx, cIdx);
                 });
                 document.getElementById(`rowTotal-${rIdx}`).innerText = rowSum.toLocaleString() + '원';
                 grandTotalSpent += rowSum;
@@ -371,6 +453,7 @@
         }
 
         async function fetchData() {
+            updateSaveStatus('saving');
             try {
                 const res = await fetch(API_URL);
                 const json = await res.json();
@@ -384,10 +467,17 @@
                         
                         parsedMatrix.forEach((mRow, rIdx) => {
                             CATEGORIES.forEach((cat, cIdx) => {
-                                const val = mRow.values[cat.name] || 0;
+                                const val = mRow.values ? mRow.values[cat.name] || 0 : 0;
                                 matrixData[rIdx][cIdx] = val;
                                 const input = document.getElementById(`cell-${rIdx}-${cIdx}`);
                                 if(input) input.value = val;
+
+                                // 처리 상태 불러오기 (하위 호환성 적용)
+                                if (mRow.statuses && mRow.statuses[cat.name]) {
+                                    statusData[rIdx][cIdx] = mRow.statuses[cat.name];
+                                } else {
+                                    statusData[rIdx][cIdx] = '미처리';
+                                }
                             });
                         });
 
@@ -401,6 +491,7 @@
                         }
                     } else {
                         matrixData = MEMBERS.map(() => Array(CATEGORIES.length).fill(0));
+                        statusData = MEMBERS.map(() => Array(CATEGORIES.length).fill('미처리'));
                         MEMBERS.forEach((_, rIdx) => {
                             CATEGORIES.forEach((_, cIdx) => {
                                 const input = document.getElementById(`cell-${rIdx}-${cIdx}`);
@@ -409,9 +500,11 @@
                         });
                     }
                     calculateAll();
+                    updateSaveStatus('saved');
                 }
             } catch(e) {
                 console.error("동기화 실패:", e);
+                updateSaveStatus('error');
             }
         }
 
@@ -419,10 +512,12 @@
             const selectedMonth = document.getElementById('monthSelect').value;
             const payloadMatrix = MEMBERS.map((m, rIdx) => {
                 const values = {};
+                const statuses = {};
                 CATEGORIES.forEach((cat, cIdx) => {
                     values[cat.name] = matrixData[rIdx][cIdx];
+                    statuses[cat.name] = statusData[rIdx][cIdx] || '미처리';
                 });
-                return { member: m, values: values };
+                return { member: m, values: values, statuses: statuses };
             });
 
             try {
@@ -436,14 +531,26 @@
                         budgets: categoryBudgets
                     })
                 });
+                saveTimeout = null;
+                updateSaveStatus('saved');
             } catch(e) {
                 console.error("저장 실패:", e);
+                updateSaveStatus('error');
             }
         }
+
+        // [개선 1] 저장 중 페이지 이탈 방지 경고창
+        window.addEventListener('beforeunload', (e) => {
+            if (saveTimeout !== null) {
+                e.preventDefault();
+                e.returnValue = '입력된 데이터가 구글 시트에 동기화 중입니다. 정말 창을 닫으시겠습니까?';
+            }
+        });
 
         function resetData() {
             if(confirm("현재 선택된 월의 데이터를 0으로 초기화하시겠습니까?")) {
                 matrixData = MEMBERS.map(() => Array(CATEGORIES.length).fill(0));
+                statusData = MEMBERS.map(() => Array(CATEGORIES.length).fill('미처리'));
                 MEMBERS.forEach((_, rIdx) => {
                     CATEGORIES.forEach((_, cIdx) => {
                         const input = document.getElementById(`cell-${rIdx}-${cIdx}`);
@@ -455,6 +562,8 @@
             }
         }
 
+        // 초기 실행
+        setDefaultMonth();
         buildGrid();
         calculateAll();
         fetchData();
